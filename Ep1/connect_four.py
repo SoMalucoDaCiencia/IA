@@ -3,7 +3,7 @@ class Circle:
     def __init__(self, x, y, player):
         self.X = x # int
         self.Y = y # int
-        self.player = player # bool
+        self.player = player # bool -> None = vazio, True = agente e False = humano
 
 # Classe do jogo inteiro
 class Schema:
@@ -55,11 +55,24 @@ class Schema:
                    board += " • "
             print(board)
 
+    # Verifica se a posição está vazia
+    def validMoves(self):
+        valid_moves = []
+        for y in range(self.ROWS):
+            for x in range(0, self.COLLUMNS):
+                if self.getAt(x, y).player == None:
+                    valid_moves.append((x, y))
+        return valid_moves
+                
+    # Valida uma vitória                
+    def won(self):
+        return self.wonDiagonal(self.player) or self.wonHorizontal(self.player) or self.wonVertical(self.player)
+
     # Define as posições de vitória
     def wonHorizontal(self, player):
         # Verifica as posições horizontais
-        for y in range(0, self.ROWS):  
-             for x in range(0, self.COLLUMNS-3): 
+        for x in range(0, self.COLLUMNS-3):   
+             for y in range(0, self.ROWS): 
                 if self.getAt(x, y).player == player and self.getAt(x+1, y).player == player and self.getAt(x+2, y).player == player and self.getAt(x+3, y).player == player:
                     return True
                 
@@ -76,4 +89,17 @@ class Schema:
             for y in range(0, self.ROWS-3):
                 if self.getAt(x, y).player == player and self.getAt(x + 1, y + 1).player == player and self.getAt(x + 2, y + 2).player == player and self.getAt(x + 3, y + 3).player == player:
                     return True
+
+    # def utility(self, player):
                 
+    def humanTurn(self):
+        jogada = -1
+        while jogada not in self.validMoves():
+            jogada = int(input("Escolha um círculo (1-7)"))
+        return jogada
+    
+# Para adiconar #
+    # Turno
+    # Jogar
+    # Utilidade
+    # Minimax
