@@ -1,3 +1,5 @@
+import re
+
 # Classe para cada círculo/posição do tabuleiro
 class Circle:
     def __init__(self, x, y, player):
@@ -56,14 +58,14 @@ class Schema:
             print(board)
 
     # Verifica se a posição está vazia
-    def validMoves(self):
-        valid_moves = []
-        for y in range(self.ROWS):
-            for x in range(0, self.COLLUMNS):
-                if self.getAt(x, y).player == None:
-                    valid_moves.append((x, y))
-        return valid_moves
-                
+    def validMoves(self, colIndex):
+        y = 0 
+        while y < self.ROWS:
+            if self.getAt(colIndex, y) != None:
+                return True
+            y += 1
+        return False
+
     # Valida uma vitória                
     def won(self):
         return self.wonDiagonal(self.player) or self.wonHorizontal(self.player) or self.wonVertical(self.player)
@@ -93,13 +95,26 @@ class Schema:
     # def utility(self, player):
                 
     def humanTurn(self):
-        jogada = -1
-        while jogada not in self.validMoves():
-            jogada = int(input("Escolha um círculo (1-7)"))
-        return jogada
+        jogada = False
+        while True:
+            if not jogada:
+                jogada = int(re.sub(r'\D', '', input("Escolha um círculo (1-7)"))) % 8
+                if self.validMoves(jogada):
+                    y        
+            else:
+                print("---------- IA JOGANDO ----------")
+                # jogar com IA 
+            
+            jogada = not jogada
     
 # Para adiconar #
     # Turno
     # Jogar
     # Utilidade
     # Minimax
+
+def remover_nao_numeros(texto):
+    texto_apenas_numeros = re.sub(r'\D', '', texto)
+    if not texto_apenas_numeros:
+        return 4
+    return texto_apenas_numeros
