@@ -61,10 +61,20 @@ class Schema:
     def validMoves(self, colIndex):
         y = 0 
         while y < self.ROWS:
-            if self.getAt(colIndex, y) != None:
+            if self.getAt(colIndex, y) == None:
                 return True
             y += 1
         return False
+    
+    # Verifica a próxima linha jogável 
+    def nextValidRow(self, y):
+        for x in range(self.ROWS):
+            if self.getAt(x, y) == None:
+                return x
+
+    # Verifica se algum player venceu, ou se deu empate      
+    def terminalNode(self):
+        return self.won(True) or self.won(False) or self.won(None)
 
     # Valida uma vitória                
     def won(self):
@@ -93,28 +103,36 @@ class Schema:
                     return True
 
     # def utility(self, player):
-                
-    def humanTurn(self):
+
+    def turns(self):
         jogada = False
         while True:
             if not jogada:
-                jogada = int(re.sub(r'\D', '', input("Escolha um círculo (1-7)"))) % 8
-                if self.validMoves(jogada):
-                    y        
+                
+                # jogada = int(re.sub(r'\D', '', input("Escolha um círculo (0-6): "))) % 7
+                jogada = int(input("Escolha um círculo (0-6): "))
+                y = 1
+                if jogada <= 6 and self.validMoves(jogada):
+                    row = self.nextValidRow(jogada) 
+                    self.setAt(row, jogada, False)
             else:
                 print("---------- IA JOGANDO ----------")
-                # jogar com IA 
+                # jogar com IA
             
+            if jogada <= 6 and jogada >= 0:
+                break
             jogada = not jogada
+            
     
 # Para adiconar #
-    # Turno
-    # Jogar
+    # Turno 50%
+    # Jogar 50%
     # Utilidade
     # Minimax
+    # Alfa
 
-def remover_nao_numeros(texto):
-    texto_apenas_numeros = re.sub(r'\D', '', texto)
-    if not texto_apenas_numeros:
-        return 4
-    return texto_apenas_numeros
+# def remover_nao_numeros(texto):
+#     texto_apenas_numeros = re.sub(r'\D', '', texto)
+#     if not texto_apenas_numeros:
+#         return 4
+#     return texto_apenas_numeros
