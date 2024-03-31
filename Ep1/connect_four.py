@@ -74,11 +74,11 @@ class Schema:
 
     # Verifica se algum player venceu, ou se deu empate      
     def terminalNode(self):
-        return self.won(True) or self.won(False) or self.won(None)
+        return self.won(True) or self.won(False) # or self.won(None)
 
     # Valida uma vitória                
-    def won(self):
-        return self.wonDiagonal(self.player) or self.wonHorizontal(self.player) or self.wonVertical(self.player)
+    def won(self, player):
+        return self.wonDiagonal(player) or self.wonHorizontal(player) or self.wonVertical(player)
 
     # Define as posições de vitória
     def wonHorizontal(self, player):
@@ -108,14 +108,17 @@ class Schema:
         if player == False:
             opponent = True
 
-        if self.content.count(player) == 4:
-            score += 100
-        elif self.content.count(player) == 3 and self.content.count(None) == 1:
-            score += 5
-        elif self.content.count(player) == 2 and self.content.count(None) == 2:
-            score += 2 
+        countPl = sum(1 for p in self.content if p.player is player)
+        countEmp = sum(1 for p in self.content if p.player is None)
+        countOpp = sum(1 for p in self.content if p.player is opponent)
 
-        elif self.content.count(opponent) == 3 and self.content.count(None) == 1:
+        if countPl == 4:
+            score += 100
+        elif countPl == 3 and countEmp == 1:
+            score += 5
+        elif countPl == 2 and countEmp == 2:
+            score += 2 
+        elif countOpp == 3 and countEmp == 1:
             score -= 4
 
         return score 
@@ -124,9 +127,9 @@ class Schema:
        score = 0 
 
     def turns(self):
-        move = False
+        turn = False
         while True:
-            if not move:
+            if not turn:
                 # jogada = int(re.sub(r'\D', '', input("Escolha um círculo (0-6): "))) % 7
                 move = int(input("Escolha um círculo (0-6): "))
                 if move <= self.ROWS and self.validMoves(move):
@@ -136,10 +139,21 @@ class Schema:
             else:
                 print("---------- IA JOGANDO ----------")
                 # jogar com IA
+                move = int(input("Escolha um círculo (0-6): "))
+                if move <= self.ROWS and self.validMoves(move):
+                    row = self.nextValidRow(move) 
+                    self.setAt(move, row, True)
+                    self.printBoard()
             
-            if move <= self.ROWS and move >= 0:
+            turn = not turn
+
+            if self.terminalNode():
                 break
-            move = not move
+            else:
+                continue
+
+            # if move <= self.ROWS and move >= 0:
+            #     break
             
     
 # Para adiconar #
