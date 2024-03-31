@@ -61,16 +61,16 @@ class Schema:
     def validMoves(self, colIndex):
         y = 0 
         while y < self.ROWS:
-            if self.getAt(colIndex, y) == None:
+            if self.getAt(colIndex, y).player == None:
                 return True
             y += 1
         return False
     
     # Verifica a próxima linha jogável 
-    def nextValidRow(self, y):
-        for x in range(self.ROWS):
-            if self.getAt(x, y) == None:
-                return x
+    def nextValidRow(self, x):
+        for y in range(self.ROWS):
+            if self.getAt(x, y).player == None:
+                return y
 
     # Verifica se algum player venceu, ou se deu empate      
     def terminalNode(self):
@@ -102,26 +102,44 @@ class Schema:
                 if self.getAt(x, y).player == player and self.getAt(x + 1, y + 1).player == player and self.getAt(x + 2, y + 2).player == player and self.getAt(x + 3, y + 3).player == player:
                     return True
 
-    # def utility(self, player):
+    def utility(self, player):
+        score = 0
+        opponent = False
+        if player == False:
+            opponent = True
+
+        if self.content.count(player) == 4:
+            score += 100
+        elif self.content.count(player) == 3 and self.content.count(None) == 1:
+            score += 5
+        elif self.content.count(player) == 2 and self.content.count(None) == 2:
+            score += 2 
+
+        elif self.content.count(opponent) == 3 and self.content.count(None) == 1:
+            score -= 4
+
+        return score 
+    
+    def evaluateUtility(self, player):
+       score = 0 
 
     def turns(self):
-        jogada = False
+        move = False
         while True:
-            if not jogada:
-                
+            if not move:
                 # jogada = int(re.sub(r'\D', '', input("Escolha um círculo (0-6): "))) % 7
-                jogada = int(input("Escolha um círculo (0-6): "))
-                y = 1
-                if jogada <= 6 and self.validMoves(jogada):
-                    row = self.nextValidRow(jogada) 
-                    self.setAt(row, jogada, False)
+                move = int(input("Escolha um círculo (0-6): "))
+                if move <= self.ROWS and self.validMoves(move):
+                    row = self.nextValidRow(move) 
+                    self.setAt(move, row, False)
+                    self.printBoard()
             else:
                 print("---------- IA JOGANDO ----------")
                 # jogar com IA
             
-            if jogada <= 6 and jogada >= 0:
+            if move <= self.ROWS and move >= 0:
                 break
-            jogada = not jogada
+            move = not move
             
     
 # Para adiconar #
