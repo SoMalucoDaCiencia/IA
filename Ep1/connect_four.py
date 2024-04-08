@@ -57,28 +57,13 @@ class Schema:
                    board += " • "
             print(board)
 
-    # Verifica se a posição está vazia
-    def validMoves(self, colIndex):
-        y = 0 
-        while y < self.ROWS:
-            if self.getAt(colIndex, y).player == None:
-                return True
-            y += 1
-        return False
+    # Valida uma vitória                
+    def won(self, player):
+        return self.wonHorizontal(player) or self.wonVertical(player) or self.wonDiagonal(player) 
     
-    # Verifica a próxima linha jogável 
-    def nextValidRow(self, x):
-        for y in range(self.ROWS):
-            if self.getAt(x, y).player == None:
-                return y
-
     # Verifica se algum player venceu, ou se deu empate      
     def terminalNode(self):
         return self.won(True) or self.won(False) # or self.won(None)
-
-    # Valida uma vitória                
-    def won(self, player):
-        return self.wonDiagonal(player) or self.wonHorizontal(player) or self.wonVertical(player)
 
     # Define as posições de vitória
     def wonHorizontal(self, player):
@@ -101,30 +86,33 @@ class Schema:
             for y in range(0, self.ROWS-3):
                 if self.getAt(x, y).player == player and self.getAt(x + 1, y + 1).player == player and self.getAt(x + 2, y + 2).player == player and self.getAt(x + 3, y + 3).player == player:
                     return True
-
-    def utility(self, player):
-        score = 0
-        opponent = False
-        if player == False:
-            opponent = True
-
-        countPl = sum(1 for p in self.content if p.player is player)
-        countEmp = sum(1 for p in self.content if p.player is None)
-        countOpp = sum(1 for p in self.content if p.player is opponent)
-
-        if countPl == 4:
-            score += 100
-        elif countPl == 3 and countEmp == 1:
-            score += 5
-        elif countPl == 2 and countEmp == 2:
-            score += 2 
-        elif countOpp == 3 and countEmp == 1:
-            score -= 4
-
-        return score 
     
-    def evaluateUtility(self, player):
-       score = 0 
+    # Verifica a próxima linha jogável 
+    def nextValidRow(self, x):
+        for y in range(self.ROWS):
+            if self.getAt(x, y).player == None:
+                return y
+    
+    # Verifica se a posição está vazia
+    def validMoves(self, colIndex):
+        y = 0 
+        while y < self.ROWS:
+            if self.getAt(colIndex, y).player == None:
+                return True
+            y += 1
+        return False
+
+    # Calcula os pontos se baseando na quantidade de peças
+    def score(self, player):
+       score = 0
+       utilMoves = []
+
+       for x in range(self.COLLUMNS):
+           for y in range(self.ROWS -3):
+               pass
+       pass
+
+
 
     def turns(self):
         turn = False
@@ -155,13 +143,6 @@ class Schema:
             # if move <= self.ROWS and move >= 0:
             #     break
             
-    
-# Para adiconar #
-    # Turno 50%
-    # Jogar 50%
-    # Utilidade
-    # Minimax
-    # Alfa
 
 # def remover_nao_numeros(texto):
 #     texto_apenas_numeros = re.sub(r'\D', '', texto)
