@@ -1,4 +1,5 @@
 import re
+import copy
 
 JOGADOR_PURO = False
 JOGADOR_IA = True
@@ -10,6 +11,13 @@ class Circle:
         self.X = x # int
         self.Y = y # int
         self.player = player # bool -> None = vazio
+
+    def copy(self):
+        # circle = Circle(self.X, self.Y, self.player)
+        # circle.X = self.X
+        # circle.Y = self.Y
+        # circle.player = self.player
+        return Circle(self.X, self.Y, self.player)
 
 # Classe do jogo inteiro
 class Schema:
@@ -26,7 +34,8 @@ class Schema:
 
     def copySchema(self):
         schema = Schema()
-        schema.content = self.content.copy()
+        # schema.content = self.content.copy()
+        schema.content = [self.content[i].copy() for i in range(42)]
         return schema
 
     # Retorna as posições do tabuleiro
@@ -74,7 +83,7 @@ class Schema:
                    board += " • "
             print(board)
 
-    # Pontua tabuleiro e retorna qual jogada fazer
+    # Pontua tabuleiro e retorna qual jogada fazer TODO: diagonal
     def scorePlayer(self, player):
         score = 0
         # Verifica as posições horizontais
@@ -88,8 +97,15 @@ class Schema:
                     noScore += 1
                 else:
                     loseScore += 1
-
-
+        
+            if wonRow == 4:
+                score += 100
+            elif wonRow == 3 and noScore >= 1:
+                score += 5
+            elif wonRow == 2 and noScore >= 2:
+                score += 2
+            if loseScore == 3 and noScore >= 1:
+                score -= 4
 
         # Verifica as posições horizontais
         for x in range(self.COLUMNS):
@@ -102,13 +118,19 @@ class Schema:
                     noScore += 1
                 else:
                     loseScore += 1
-
-
-
+        
+            if wonRow == 4:
+                score += 100
+            elif wonRow == 3 and noScore >= 1:
+                score += 5
+            elif wonRow == 2 and noScore >= 2:
+                score += 2
+            if loseScore == 3 and noScore >= 1:
+                score -= 4
 
         return score
 
-    # Valida uma vitória
+    # Valida uma vitória TODO: diagonal
     def won(self, player):
         # Verifica as posições horizontais
         for y in range(0, self.ROWS):
@@ -133,12 +155,6 @@ class Schema:
                 else:
                     wonCol = 0
             wonCol = 0
-            #  •  •  •  •  •  •  • 
-            #  •  •  •  •  •  •  • 
-            #  •  •  •  •  •  •  •  
-            #  •  •  •  •  •  •  • 
-            #  •  •  •  •  ●  •  •
-            #  •  •  •  ●  •  •  • 
 
         # Verifica as posições diagonais
         for x in range(0, self.COLUMNS-3):
@@ -148,6 +164,21 @@ class Schema:
                     return True
 
         return False
+
+    # actual: profundidade atual, max: profundidade maxima, pos: posicao a ser jogada, min: booleano de min ou de max
+    def minmax(self, actual, maxDepth, min, player):
+        if actual == maxDepth:
+            return self.scorePlayer(player)
+        list = []
+        for x in range(0, self.COLUMNS):
+            n = self.copySchema()
+            n.setAtCol(x, player)
+            list.append((x, n.minmax(actual+1, maxDepth, not min, not player)))
+        list = sorted(list, key=lambda tup: tup[1])
+        if min:
+            return list[0][0]
+        else:
+            return list[6][0]
 
     # Verifica a próxima linha jogável
     def nextValidRow(self, x):
@@ -178,8 +209,8 @@ class Schema:
 
             else:
                 print("\n------------- Vez da IA ------------\n")
-                move = self.colunInput()
-                self.setAtCol(move, JOGADOR_IA)
+                # move = self.colunInput()
+                self.setAtCol(self.minmax(0, 3, True, JOGADOR_IA), JOGADOR_IA)
                 print(self.scorePlayer(JOGADOR_IA))
                 if self.won(JOGADOR_IA):
                     self.printBoard()
@@ -192,7 +223,7 @@ class Schema:
 
 jogo = Schema()
 jogo.printBoard()
-jogo.startGame(JOGADOR_IA)
+jogo.startGame(JOGADOR_PURO)
 
  
 #  •  •  •  •  •  •  • 
