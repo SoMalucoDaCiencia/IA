@@ -174,16 +174,10 @@ class Schema:
         list = []
         for x in range(0, self.COLUMNS):
             n = self.copySchema()
-            collum = n.setAtCol(x, player)
-            if collum == "error":
-                return
-            else:
+            if n.setAtCol(x, player) != "error":
                 list.append((x, n.minmax(actual+1, maxDepth, not min, player)))
         list = sorted(list, key=lambda tup: tup[1])
-        if min:
-            return list[0][0]
-        else:
-            return list[6][0]
+        return list[0 if min else 6][0]
 
     # Verifica a próxima linha jogável
     def nextValidRow(self, x):
