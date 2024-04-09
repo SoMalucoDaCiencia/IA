@@ -1,5 +1,4 @@
 import re
-import copy
 
 JOGADOR_PURO = False
 JOGADOR_IA = True
@@ -13,10 +12,6 @@ class Circle:
         self.player = player # bool -> None = vazio
 
     def copy(self):
-        # circle = Circle(self.X, self.Y, self.player)
-        # circle.X = self.X
-        # circle.Y = self.Y
-        # circle.player = self.player
         return Circle(self.X, self.Y, self.player)
 
 # Classe do jogo inteiro
@@ -73,18 +68,22 @@ class Schema:
 
     # Printa o tabuleiro
     def printBoard(self):
+        print("+---------------------+")
+        print("|" + '\033[95m' + " 0  1  2  3  4  5  6 " + '\033[0m' + "|")
+        print("+---------------------+")
         for y in range(self.ROWS-1, -1, -1):
             board = ""
             for x in range(0, self.COLUMNS):
                circle = self.getAt(x, y)
                if circle.player == JOGADOR_IA:
-                   board += '\033[91m' + " ● " + '\033[0m' # VERMELHO
+                   board += '\033[91m' + " ● " + '\033[0m' # VERMELHO; (96 = AZUL)
                elif circle.player == JOGADOR_PURO:
-                   board += '\033[93m' + " ● " + '\033[0m' # AMARELO
+                   board += '\033[93m' + " ● " + '\033[0m' # AMARELO;
                else:
                    board += " • "
-            print(board)
-
+            print("|" + board + "|")
+        print("+---------------------+")
+            
     # Pontua tabuleiro e retorna qual jogada fazer TODO: diagonal
     def scorePlayer(self, player):
         score = 0
@@ -99,14 +98,15 @@ class Schema:
                     noScore += 1
                 else:
                     loseScore += 1
-        
+
+            # print(wonRow, noScore, loseScore, y)
             if wonRow == 4:
                 score += 100
             elif wonRow == 3 and noScore >= 1:
                 score += 5
             elif wonRow == 2 and noScore >= 2:
                 score += 2
-            if loseScore == 3 and noScore >= 1:
+            elif loseScore == 3 and noScore >= 1:
                 score -= 4
 
         # Verifica as posições verticais
@@ -119,15 +119,16 @@ class Schema:
                 elif circle == SEM_PLAYER:
                     noScore += 1
                 else:
-                    loseScore += 1
-        
+                    wonRow += 1
+
+            # print(wonRow, noScore, loseScore, x)
             if wonRow == 4:
                 score += 100
             elif wonRow == 3 and noScore >= 1:
                 score += 5
             elif wonRow == 2 and noScore >= 2:
                 score += 2
-            if loseScore == 3 and noScore >= 1:
+            elif loseScore == 3 and noScore >= 1:
                 score -= 4
 
         return score
@@ -200,7 +201,7 @@ class Schema:
                 print("\n---------- Vez do usuário ----------\n")
                 move = self.colunInput()
                 self.setAtCol(move, JOGADOR_PURO)
-                print(self.scorePlayer(JOGADOR_PURO))
+                # print(self.scorePlayer(JOGADOR_PURO))
                 if self.won(JOGADOR_PURO):
                     self.printBoard()
                     print("\n---------- Vitória do usuário ----------\n")
@@ -209,8 +210,8 @@ class Schema:
             else:
                 print("\n------------- Vez da IA ------------\n")
                 # move = self.colunInput()
-                self.setAtCol(self.minmax(0, 5, False, JOGADOR_IA), JOGADOR_IA)
-                print(self.scorePlayer(JOGADOR_IA))
+                self.setAtCol(self.minmax(0, 3, False, JOGADOR_IA), JOGADOR_IA)
+                # print(self.scorePlayer(JOGADOR_IA))
                 if self.won(JOGADOR_IA):
                     self.printBoard()
                     print("\n------------- Vitória da IA -------------\n")
@@ -219,23 +220,13 @@ class Schema:
             self.printBoard()
             startWith = not startWith
 
-
 jogo = Schema()
-jogo.printBoard()
+# jogo.printBoard()
 jogo.startGame(JOGADOR_PURO)
+# jogo.setAtCol(4, JOGADOR_PURO)
+# jogo.setAtCol(4, JOGADOR_IA)
 # jogo.setAtCol(5, JOGADOR_PURO)
-# jogo.setAtCol(5, JOGADOR_PURO)
-# jogo.setAtCol(5, JOGADOR_PURO)
-# jogo.setAtCol(6, JOGADOR_IA)
 # jogo.setAtCol(6, JOGADOR_IA)
 # jogo.printBoard()
 # print(jogo.scorePlayer(JOGADOR_IA))
 # print(jogo.scorePlayer(JOGADOR_PURO))
-
- 
-#  •  •  •  •  •  •  • 
-#  •  •  •  •  •  •  • 
-#  •  •  •  •  •  •  • 
-#  •  •  •  •  •  •  • 
-#  •  •  •  •  ●  •  •
-#  •  •  •  ●  •  •  • 
