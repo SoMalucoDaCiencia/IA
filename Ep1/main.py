@@ -68,6 +68,8 @@ class Schema:
             if self.getAt(col, y).player == SEM_PLAYER:
                 self.setAt(col, y, player)
                 break
+            elif y == self.COLUMNS-1:
+                return "error"
 
     # Printa o tabuleiro
     def printBoard(self):
@@ -76,7 +78,7 @@ class Schema:
             for x in range(0, self.COLUMNS):
                circle = self.getAt(x, y)
                if circle.player == JOGADOR_IA:
-                   board += '\033[96m' + " ● " + '\033[0m' # AZUL
+                   board += '\033[91m' + " ● " + '\033[0m' # VERMELHO
                elif circle.player == JOGADOR_PURO:
                    board += '\033[93m' + " ● " + '\033[0m' # AMARELO
                else:
@@ -107,7 +109,7 @@ class Schema:
             if loseScore == 3 and noScore >= 1:
                 score -= 4
 
-        # Verifica as posições horizontais
+        # Verifica as posições verticais
         for x in range(self.COLUMNS):
             wonRow, loseScore, noScore = 0, 0, 0
             for y in range(self.ROWS):
@@ -168,12 +170,15 @@ class Schema:
     # actual: profundidade atual, max: profundidade maxima, pos: posicao a ser jogada, min: booleano de min ou de max
     def minmax(self, actual, maxDepth, min, player):
         if actual == maxDepth:
-            return self.scorePlayer(player)
+            return self.scorePlayer( not player)
         list = []
         for x in range(0, self.COLUMNS):
             n = self.copySchema()
-            n.setAtCol(x, player)
-            list.append((x, n.minmax(actual+1, maxDepth, not min, not player)))
+            collum = n.setAtCol(x, player)
+            if collum == "error":
+                return
+            else:
+                list.append((x, n.minmax(actual+1, maxDepth, not min, player)))
         list = sorted(list, key=lambda tup: tup[1])
         if min:
             return list[0][0]
@@ -210,7 +215,7 @@ class Schema:
             else:
                 print("\n------------- Vez da IA ------------\n")
                 # move = self.colunInput()
-                self.setAtCol(self.minmax(0, 3, True, JOGADOR_IA), JOGADOR_IA)
+                self.setAtCol(self.minmax(0, 5, False, JOGADOR_IA), JOGADOR_IA)
                 print(self.scorePlayer(JOGADOR_IA))
                 if self.won(JOGADOR_IA):
                     self.printBoard()
@@ -224,6 +229,14 @@ class Schema:
 jogo = Schema()
 jogo.printBoard()
 jogo.startGame(JOGADOR_PURO)
+# jogo.setAtCol(5, JOGADOR_PURO)
+# jogo.setAtCol(5, JOGADOR_PURO)
+# jogo.setAtCol(5, JOGADOR_PURO)
+# jogo.setAtCol(6, JOGADOR_IA)
+# jogo.setAtCol(6, JOGADOR_IA)
+# jogo.printBoard()
+# print(jogo.scorePlayer(JOGADOR_IA))
+# print(jogo.scorePlayer(JOGADOR_PURO))
 
  
 #  •  •  •  •  •  •  • 
